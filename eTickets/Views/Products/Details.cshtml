@@ -1,0 +1,107 @@
+﻿@using eTickets.Data.ViewModels;
+@model ProductAndVoteVM
+<script src="~/js/jquery/jquery.min.js"></script>
+
+@{
+    ViewData["Title"] = "Product details";
+}
+
+<div class="row">
+    <div class="col-md-8 offset-2">
+        <div class="card mb-12" id="divMainBody">
+            <div class="row g-0">
+                <div class="col-md-12">
+                    <div class="card-header text-white bg-info">
+                        <p class="card-text">
+                            <h5 class="card-title">
+                                @Model.Product.Name
+                            </h5>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <img src="@Model.Product.ImageURL" width="100%" alt="@Model.Product.Name">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <p class="card-text">@Model.Product.Description</p>
+                        <p class="card-text"><b>Start Date: </b>@Model.Product.StartDate.ToString("dd MMM yy")</p>
+                        <p class="card-text"><b>End Date: </b>@Model.Product.EndDate.ToString("dd MMM yy")</p>
+                        <p class="card-text ">
+                            <b>Status: </b>
+                            @if (DateTime.Now >= Model.Product.StartDate && DateTime.Now <= Model.Product.EndDate)
+                            {
+                                <span class="badge bg-success text-white">AVAILABLE</span>
+                            }
+                            else if (DateTime.Now > Model.Product.EndDate)
+                            {
+                                <span class="badge bg-danger text-white">EXPIRED</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-primary text-white">UPCOMING</span>
+                            }
+                        </p>
+                        <p class="card-text">
+                        </p>
+
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="card-footer">
+                        <p class="card-text">
+                            <a class="btn btn-outline-primary float-right" asp-action="Index">
+                                Back to List
+                            </a>
+                            <a class="btn btn-success text-white  @((DateTime.Now > Model.Product.EndDate) ? "disabled" : "disabled")"><i class="bi bi-cart-plus"></i> Add to Cart (Price @Model.Product.Price.ToString("c"))</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            @foreach (var d in @Model.AuctionVote)
+            {
+                <b>@Html.Raw(d.FullName)</b><b>: $</b>@Html.Raw(d.Price) <br />
+            }
+            @if (DateTime.Now >= Model.Product.StartDate && DateTime.Now <= Model.Product.EndDate)
+            {
+                <form asp-action="Details">
+                <div asp-asp-validation-summary="ModelOnly" class="text-danger"></div>
+                
+                <div class="col-md-10" style="display: none;">
+                    @Html.EditorFor(model => model.User.FullName)
+                </div>
+                <div class="col-md-10" style="display: none;">
+                    @Html.EditorFor(model => model.Product.Id)
+                </div>
+                <div class="col-md-10" style="display: none;">
+                    @Html.EditorFor(model => model.Product.Price)
+                </div>
+                <div class="form-group">
+                    Your value: <input asp-for="@Model.AuctionVoteRegister.Price" class="control-label col-md-2" />
+                </div>
+                <div class="form-group">
+                        <input type="submit" value="Add your value" class="btn btn-outline-primary" />
+                </div>
+            </form>
+            }
+            else if (DateTime.Now > Model.Product.EndDate)
+            {
+                <span class="badge bg-danger text-white">Auction is expired</span>
+            }
+            else
+            {
+                <span class="badge bg-primary text-white">Auction is upcoming</span>
+            }
+
+        </div>
+    <div>
+        <p style="text-align: right;">
+            <button class="btn btn-outline-info me-2" id="btnGenerate">PDF</button>
+        </p>
+    </div>
+    </div>
+</div>
+
+<script src="~/js/PDFGenerator.js"></script>
